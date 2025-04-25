@@ -53,7 +53,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-4xl mx-auto mt-6 py-8 px-4 sm:px-6 lg:px-8">
       <div className="space-y-8">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Configurações do Perfil</h2>

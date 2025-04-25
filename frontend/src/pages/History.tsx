@@ -72,7 +72,7 @@ const History: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto mt-6 py-8 px-4 sm:px-6 lg:px-8">
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900">Histórico de Sessões</h2>
         <p className="mt-1 text-sm text-gray-500">
@@ -87,7 +87,7 @@ const History: React.FC = () => {
               <h3 className="text-lg font-medium text-gray-900">Sessões</h3>
             </div>
             <div className="border-t border-gray-200">
-              <ul className="divide-y divide-gray-200">
+              <ul className="divide-y divide-gray-200 max-h-[calc(100vh-200px)] overflow-y-auto">
                 {sessions.map((session) => (
                   <li
                     key={session.id}
@@ -122,8 +122,8 @@ const History: React.FC = () => {
 
         <div className="lg:col-span-2">
           {selectedSession ? (
-            <div className="bg-white shadow rounded-lg">
-              <div className="px-4 py-5 sm:px-6">
+            <div className="bg-white shadow rounded-lg h-[calc(100vh-200px)] flex flex-col">
+              <div className="px-4 py-5 sm:px-6 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium text-gray-900">
                     Detalhes da Sessão
@@ -143,7 +143,7 @@ const History: React.FC = () => {
                   Fim: {formatDate(selectedSession.ended_at)}
                 </p>
               </div>
-              <div className="border-t border-gray-200">
+              <div className="border-t border-gray-200 flex-grow overflow-y-auto">
                 <div className="px-4 py-5 sm:p-6">
                   <div className="space-y-4">
                     {selectedSession.messages.map((message) => (

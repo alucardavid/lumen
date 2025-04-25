@@ -16,6 +16,7 @@ from app.schemas.chat import (
     ChatHistoryResponse
 )
 from app.services.chat_service import ChatService
+from app.services import summary as summary_service
 from fastapi.security import HTTPBearer
 
 router = APIRouter()
@@ -192,11 +193,19 @@ async def end_session(
             detail="Esta sessão já está finalizada"
         )
     
+    # End the session
     session.is_active = False
     session.ended_at = func.now()
     db.commit()
-    db.refresh(session)
     
+    # Generate session summary
+    try:
+        summary_service.create_session_summary(db, session_id)
+    except Exception as e:
+        # Log the error but don't fail the session end
+        print(f"Error generating summary: {str(e)}")
+    
+    db.refresh(session)
     return session
 
 @router.get("/session/active", response_model=ChatSessionResponse)

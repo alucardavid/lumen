@@ -48,10 +48,10 @@ const Footer: React.FC = () => {
             </h3>
             <ul className="mt-4 space-y-2">
               <li className="text-sm text-gray-500">
-                Email: contato@lumenapp.com.br
+                Email: d_pereira@outlook.com.br
               </li>
               <li className="text-sm text-gray-500">
-                Telefone: (11) 99999-9999
+                Telefone: (11) 96468-5433
               </li>
             </ul>
           </div>

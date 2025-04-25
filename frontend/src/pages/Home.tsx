@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 interface ActiveSession {
   id: number;
   started_at: string;
   is_active: boolean;
+  created_at: string;
 }
 
 interface ApiError {
@@ -20,30 +22,43 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const checkActiveSession = async () => {
-      try {
-        const response = await axios.get<ActiveSession>('http://localhost:8000/api/chat/session/active');
-        setActiveSession(response.data);
-      } catch (err) {
-        const error = err as { response?: { status: number } };
-        if (error.response?.status === 404) {
-          setActiveSession(null);
-        } else {
-          setError('Erro ao verificar sessão ativa');
-        }
-      } finally {
-        setLoading(false);
+  const checkActiveSession = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get<ActiveSession>(
+        API_ENDPOINTS.CHAT.SESSION.ACTIVE,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      setActiveSession(response.data);
+      setError(null);
+    } catch (err) {
+      const error = err as { response?: { status: number; data?: { detail: string } } };
+      if (error.response?.status === 404) {
+        setActiveSession(null);
+      } else {
+        setError(error.response?.data?.detail || 'Erro ao verificar sessão ativa');
       }
-    };
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     checkActiveSession();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkActiveSession();
+    }, 30000); // 30 segundos
+
+    return () => clearInterval(interval);
   }, []);
 
   const startSession = async () => {
     try {
       setLoading(true);
-      const response = await axios.post<ActiveSession>('http://localhost:8000/api/chat/session/start');
+      const response = await axios.post<ActiveSession>(API_ENDPOINTS.CHAT.SESSION.START);
       setActiveSession(response.data);
       navigate('/chat');
     } catch (err) {
@@ -59,7 +74,7 @@ const Home: React.FC = () => {
 
     try {
       setLoading(true);
-      await axios.post(`http://localhost:8000/api/chat/session/${activeSession.id}/end`);
+      await axios.post(API_ENDPOINTS.CHAT.SESSION.END(activeSession.id));
       setActiveSession(null);
       navigate('/history');
     } catch (err) {
