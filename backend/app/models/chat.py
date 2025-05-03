@@ -39,6 +39,8 @@ class SessionSummary(Base):
     overall_sentiment = Column(String)
     risk_level = Column(String)
     key_topics = Column(String)  # Store as JSON
+    suggestions = Column(String)  # Store as JSON
+    progress_observations = Column(String)  # Store as JSON
     message_count = Column(Integer)
     duration_minutes = Column(Float)
     summary_text = Column(Text)

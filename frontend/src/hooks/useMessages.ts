@@ -16,7 +16,21 @@ export const useMessages = (sessionId: number | null) => {
         API_ENDPOINTS.CHAT.SESSION.MESSAGES(sessionId),
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
+      if (response.data.length > 0) {
       setMessages(response.data);
+      }
+      else {
+        sendAiMessage(`👋 Olá! Meu nome é Lumen e estou aqui para te ajudar. Como você está se sentindo hoje? 
+
+                    💭 Posso te ajudar com:
+                    • 🗣️ Conversar sobre seus sentimentos
+                    • 🤔 Explorar suas preocupações
+                    • 💡 Refletir sobre suas experiências
+                    • 🌟 Encontrar formas de lidar com desafios
+
+                    Por onde você gostaria de começar?
+                    `)
+      }
     } catch (error) {
       console.error('Error fetching messages:', error);
     }
@@ -38,13 +52,19 @@ export const useMessages = (sessionId: number | null) => {
     try {
       const userMessageResponse = await axios.post<Message>(
         API_ENDPOINTS.CHAT.MESSAGE,
-        { content: userMessage },
+        { content: userMessage, is_user: true },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
 
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      setMessages(prev => [...prev, userMessageResponse.data]);
+      setMessages(prev => [...prev, {
+        id: prev.length + 1,
+        content: userMessageResponse.data.content,
+        is_user: false,
+        created_at: new Date().toISOString()
+      }]);
+
     } catch (error) {
       console.error('Error sending message:', error);
     } finally {
@@ -53,36 +73,36 @@ export const useMessages = (sessionId: number | null) => {
     }
   };
 
-  const sendAiMessage = (content: string) => {
+  const sendAiMessage = async (content: string) => {
+    if (!sessionId) return;
+    
+    const aiMessage = content;
     setMessages(prev => [...prev, {
       id: prev.length + 1,
       content,
       is_user: false,
       created_at: new Date().toISOString()
     }]);
-  };
 
-  const getSessionSummary = async () => {
-    if (!sessionId) return null;
-    
     try {
-      const response = await axios.get<{
-        summary_text: string,
-        key_topics: string[],
-        overall_sentiment: string,
-        risk_level: string,
-        message_count: number,
-        duration_minutes: number
-      }>(
-        API_ENDPOINTS.CHAT.SESSION.GET_SUMMARY(sessionId),
+      const userMessageResponse = await axios.post<Message>(
+        API_ENDPOINTS.CHAT.MESSAGE,
+        { content: aiMessage, is_user: false },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-      return response.data;
+
+      // await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // setMessages(prev => [...prev, userMessageResponse.data]);
     } catch (error) {
-      console.error('Error fetching session summary:', error);
-      return null;
+      console.error('Error sending message:', error);
+    } finally {
+      setLoading(false);
+      setIsAiThinking(false);
     }
   };
+
+  
 
   useEffect(() => {
     fetchMessages();
@@ -93,7 +113,6 @@ export const useMessages = (sessionId: number | null) => {
     loading,
     isAiThinking,
     sendMessage,
-    sendAiMessage,
-    getSessionSummary
+    sendAiMessage
   };
 };

@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from app.models.chat import ChatSession, ChatMessage, SessionSummary
 from app.schemas.summary import SessionSummaryCreate
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import json
-from app.services.ai_summary import generate_session_summary, extract_key_topics
+from app.services.ai_summary import generate_session_summary
 from app.services.metrics import calculate_session_metrics
 
 def create_session_summary(db: Session, session_id: int) -> SessionSummary:
@@ -18,20 +18,26 @@ def create_session_summary(db: Session, session_id: int) -> SessionSummary:
     metrics = calculate_session_metrics(db, session_id)
     
     # Generate summary using AI
-    summary_text = generate_session_summary(messages, metrics)
+    summary_data = generate_session_summary(messages, metrics)
     
-    # Extract key topics using AI
-    key_topics = extract_key_topics(summary_text)
-    
-    # Create summary object
+    # summary_data = {
+    #     "key_topics": ["Tópico 1", "Tópico 2", "Tópico 3"],
+    #     "suggestions": ["Sugestão 1", "Sugestão 2", "Sugestão 3"],
+    #     "progress_observations": ["Observação 1", "Observação 2", "Observação 3"],
+    #     "summary_text": "Resumo detalhado da sessão, incluindo os principais pontos discutidos e conclusões"
+    # }
+
+    # Create summary object with direct assignment of fields
     db_summary = SessionSummary(
         session_id=session_id,
         overall_sentiment=metrics['overall_sentiment'],
         risk_level=metrics['risk_level'] or 'low',
-        key_topics=json.dumps(key_topics),
+        key_topics=json.dumps(summary_data.get('key_topics', [])),
         message_count=metrics['message_count'],
         duration_minutes=metrics['duration_minutes'],
-        summary_text=summary_text
+        summary_text=summary_data.get('summary_text', ''),
+        suggestions=json.dumps(summary_data.get('suggestions', [])),
+        progress_observations=json.dumps(summary_data.get('progress_observations', []))
     )
     
     db.add(db_summary)
@@ -49,10 +55,33 @@ def calculate_session_metrics(db: Session, session_id: int) -> dict:
     
     messages = db.query(ChatMessage).filter(ChatMessage.session_id == session_id).all()
     
-    # Calculate duration
-    start_time = datetime.fromisoformat(session.started_at)
-    end_time = datetime.fromisoformat(session.ended_at) if session.ended_at else datetime.utcnow()
-    duration_minutes = (end_time - start_time).total_seconds() / 60
+    try:
+        # Create UTC-3 timezone
+        utc_minus_3 = timezone(timedelta(hours=-3))
+        
+        # Parse start_time and ensure it's in UTC-3
+        start_time = datetime.fromisoformat(session.started_at)
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=utc_minus_3)
+        else:
+            start_time = start_time.astimezone(utc_minus_3)
+        
+        # Parse end_time and ensure it's in UTC-3
+        end_time = datetime.fromisoformat(session.ended_at) if session.ended_at else datetime.now()
+        if end_time.tzinfo is None:
+            end_time = end_time.replace(tzinfo=utc_minus_3)
+        else:
+            end_time = end_time.astimezone(utc_minus_3)
+        
+        print("start_time", start_time.tzinfo)
+        print("end_time", end_time.tzinfo)
+
+        # Calculate duration in minutes
+        duration_minutes = (end_time - start_time).total_seconds() / 60
+        print("duration_minutes", duration_minutes)
+    except Exception as e:
+        print(f"Error calculating duration: {str(e)}")
+        raise
     
     # Count messages
     message_count = len(messages)

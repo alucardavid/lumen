@@ -1,27 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, act } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
-
-interface ActiveSession {
-  id: number;
-  started_at: string;
-  is_active: boolean;
-  created_at: string;
-}
-
-interface ApiError {
-  detail: string;
-}
+import { useChatSession } from '../hooks/useChatSession';
+import { ActiveSession } from '../types/session';
 
 const Home: React.FC = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+  const { startSession, endSession  } = useChatSession();
+  
   const checkActiveSession = async () => {
     try {
       setLoading(true);
@@ -43,47 +33,18 @@ const Home: React.FC = () => {
     }
   };
 
+  const handleEndSession = async (sessionId: number) => {
+    try {
+      await endSession(sessionId);
+      await checkActiveSession(); // Refresh active session after ending
+    } catch (err) {
+      console.error('Error ending session:', err);
+    }
+  }
+
   useEffect(() => {
     checkActiveSession();
   }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      checkActiveSession();
-    }, 30000); // 30 segundos
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const startSession = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.post<ActiveSession>(API_ENDPOINTS.CHAT.SESSION.START);
-      setActiveSession(response.data);
-      navigate('/chat');
-    } catch (err) {
-      const error = err as { response?: { data?: ApiError } };
-      setError(error.response?.data?.detail || 'Erro ao iniciar sessão');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const endSession = async () => {
-    if (!activeSession) return;
-
-    try {
-      setLoading(true);
-      await axios.post(API_ENDPOINTS.CHAT.SESSION.END(activeSession.id));
-      setActiveSession(null);
-      navigate('/history');
-    } catch (err) {
-      const error = err as { response?: { data?: ApiError } };
-      setError(error.response?.data?.detail || 'Erro ao finalizar sessão');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
@@ -104,7 +65,7 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-16">
+    <div className="h-full bg-gray-100 pt-16">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -151,7 +112,7 @@ const Home: React.FC = () => {
                     Continuar Conversa
                   </button>
                   <button
-                    onClick={endSession}
+                    onClick={() => handleEndSession(activeSession.id)}
                     disabled={loading}
                     className="flex-1 bg-red-600 text-white py-3 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                   >

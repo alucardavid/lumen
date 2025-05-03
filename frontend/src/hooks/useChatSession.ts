@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ChatSession, Message } from '../types/chat';
+import { ApiError, ChatSession, Message } from '../types/chat';
 import { API_ENDPOINTS } from '../config/api';
+import { useNavigate } from 'react-router-dom';
+import { ActiveSession } from '../types/session';
 
 export const useChatSession = () => {
   const [activeSession, setActiveSession] = useState<ChatSession | null>(null);
   const [sessionEnding, setSessionEnding] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchActiveSession = async () => {
     try {
@@ -21,12 +25,25 @@ export const useChatSession = () => {
     }
   };
 
+  const startSession = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.post<ActiveSession>(API_ENDPOINTS.CHAT.SESSION.START);
+      setActiveSession(response.data);
+      navigate('/chat');
+    } catch (err) {
+      const error = err as { response?: { data?: ApiError } };
+      setError(error.response?.data?.detail || 'Erro ao iniciar sessão');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const endSession = async (sessionId: number) => {
     try {
-      setSessionEnding(true);
       setError(null);
       
-      let teste = await axios.post(
+      let sessionEnded = await axios.post(
         API_ENDPOINTS.CHAT.SESSION.END(sessionId),
         {},
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
@@ -47,16 +64,17 @@ export const useChatSession = () => {
     }
   };
 
-  useEffect(() => {
-    fetchActiveSession();
-  }, []);
-
   return {
     activeSession,
     sessionEnding,
     error,
+    loading,
     fetchActiveSession,
+    startSession,
     endSession,
-    setError
+    setError,
+    setActiveSession
   };
 };
+
+

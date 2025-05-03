@@ -27,6 +27,7 @@ def get_summary(
     
     # Get existing summary
     db_summary = summary_service.get_session_summary(db, session_id)
+    
     if not db_summary:
         raise HTTPException(status_code=404, detail="Summary not found")
     
@@ -34,6 +35,14 @@ def get_summary(
     if db_summary.key_topics:
         db_summary.key_topics = json.loads(db_summary.key_topics)
     
+    # Converter suggestions de JSON string para lista
+    if db_summary.suggestions:
+        db_summary.suggestions = json.loads(db_summary.suggestions)
+    
+    # Converter progress_observations de JSON string para lista
+    if db_summary.progress_observations:
+        db_summary.progress_observations = json.loads(db_summary.progress_observations)
+
     # Garantir que risk_level não seja None
     if db_summary.risk_level is None:
         db_summary.risk_level = "low"  # valor padrão
@@ -71,6 +80,14 @@ def create_summary(
     if db_summary.key_topics:
         db_summary.key_topics = json.loads(db_summary.key_topics)
     
+    # Converter suggestions de JSON string para lista
+    if db_summary.suggestions:
+        db_summary.suggestions = json.loads(db_summary.suggestions)
+    
+    # Converter progress_observations de JSON string para lista
+    if db_summary.progress_observations:
+        db_summary.progress_observations = json.loads(db_summary.progress_observations)
+
     # Garantir que risk_level não seja None
     if db_summary.risk_level is None:
         db_summary.risk_level = "low"  # valor padrão

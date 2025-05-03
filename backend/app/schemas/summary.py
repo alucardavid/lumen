@@ -10,6 +10,8 @@ class SessionSummaryBase(BaseModel):
     message_count: int
     duration_minutes: float
     summary_text: str
+    suggestions: List[str]
+    progress_observations: List[str]
     
 class SessionSummaryCreate(SessionSummaryBase):
     pass

@@ -4,6 +4,7 @@ from typing import List
 
 class ChatMessageBase(BaseModel):
     content: str
+    is_user: bool
 
 class ChatMessageCreate(ChatMessageBase):
     pass

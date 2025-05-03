@@ -44,6 +44,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         <div className="flex justify-center items-center py-2">
           <SessionTimer 
             startTime={activeSession.started_at} 
+            isActive={!sessionEnding}
+            sessionEnding={sessionEnding}
             onTimeWarning={onTimeWarning}
             onTimeEnd={onTimeEnd}
           />

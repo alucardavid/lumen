@@ -1,23 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { ChatSession } from '../../types/chat';
 
 interface SessionTimerProps {
   startTime: string | undefined;
+  isActive: boolean;
+  sessionEnding: boolean;
   onTimeWarning: () => void;
   onTimeEnd: () => void;
 }
 
 export const SessionTimer: React.FC<SessionTimerProps> = ({ 
   startTime, 
+  isActive,
+  sessionEnding,
   onTimeWarning,
   onTimeEnd 
 }) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [warningShown, setWarningShown] = useState(false);
+  const [timeEndCalled, setTimeEndCalled] = useState(false);
+
+  // Reset warning state when session becomes inactive or startTime changes
+  useEffect(() => {
+    setWarningShown(false);
+    setTimeEndCalled(false);
+  }, [startTime, isActive]);
 
   useEffect(() => {
-    if (!startTime) {
-      console.log('No start time available');
+    if (!startTime || !isActive || sessionEnding) {
+      console.log('No start time available or session is not active or is ending');
       return;
     }
 
@@ -26,15 +36,18 @@ export const SessionTimer: React.FC<SessionTimerProps> = ({
       const interval = setInterval(() => {
         const now = new Date().getTime();
         const elapsedSeconds = Math.floor((now - sessionStart) / 1000);
-        const remainingSeconds = Math.max(10 - elapsedSeconds, 0); // 30 minutos = 1800 segundos
+        const remainingSeconds = Math.max(60 - elapsedSeconds, 0); // 30 minutos = 1800 segundos
         setTimeLeft(remainingSeconds);
 
-        if (remainingSeconds <= 60 && !warningShown) {
+        if (!isActive || sessionEnding) return;
+
+        if (remainingSeconds <= 300 && !warningShown) {
           setWarningShown(true);
           onTimeWarning();
         }
 
-        if (remainingSeconds === 0) {
+        if (remainingSeconds === 0 && !timeEndCalled) {
+          setTimeEndCalled(true);
           onTimeEnd();
         }
       }, 1000);
@@ -43,9 +56,9 @@ export const SessionTimer: React.FC<SessionTimerProps> = ({
     } catch (error) {
       console.error('Error parsing date:', error);
     }
-  }, [startTime, warningShown, onTimeWarning, onTimeEnd]);
+  }, [startTime, isActive, sessionEnding, timeEndCalled, onTimeWarning, onTimeEnd]);
 
-  if (!startTime || timeLeft <= 0) return null;
+  if (!startTime || timeLeft <= 0 || !isActive) return null;
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;

@@ -56,29 +56,33 @@ async def send_message(
     user_message = ChatMessage(
         session_id=chat_session.id,
         content=message.content,
-        is_user=True
+        is_user=message.is_user
     )
     db.add(user_message)
-    
-    # Get context from previous messages
-    context = db.query(ChatMessage).filter(
-        ChatMessage.session_id == chat_session.id
-    ).order_by(ChatMessage.created_at.desc()).limit(5).all()
-    
-    # Get AI response
-    # ai_response = await chat_service.get_ai_response(message, context)
-    
-    # Create AI message
-    ai_message = ChatMessage(
-        session_id= chat_session.id,
-        content= 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.', #ai_response,
-        is_user=False
-    )
-    db.add(ai_message)
-    
     db.commit()
-    db.refresh(ai_message)
-    return ai_message
+    db.refresh(user_message)
+
+    if message.is_user:
+        # Get context from previous messages
+        context = db.query(ChatMessage).filter(
+            ChatMessage.session_id == chat_session.id
+        ).order_by(ChatMessage.created_at.desc()).limit(5).all()
+        
+        # Get AI response
+        ai_response = await chat_service.get_ai_response(message, context)
+        
+        # Create AI message
+        ai_message = ChatMessage(
+            session_id= chat_session.id,
+            content= ai_response,
+            is_user=False
+        )
+        db.add(ai_message)
+        db.commit()
+        db.refresh(ai_message)
+        return ai_message
+
+    return user_message
 
 @router.get("/history", dependencies=[Depends(security)])
 async def get_chat_history(
@@ -197,14 +201,6 @@ async def end_session(
     session.is_active = False
     session.ended_at = func.now()
     db.commit()
-    
-    # Generate session summary
-    try:
-        summary_service.create_session_summary(db, session_id)
-    except Exception as e:
-        # Log the error but don't fail the session end
-        print(f"Error generating summary: {str(e)}")
-    
     db.refresh(session)
     return session
 
