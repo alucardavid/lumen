@@ -36,7 +36,7 @@ export const SessionTimer: React.FC<SessionTimerProps> = ({
       const interval = setInterval(() => {
         const now = new Date().getTime();
         const elapsedSeconds = Math.floor((now - sessionStart) / 1000);
-        const remainingSeconds = Math.max(60 - elapsedSeconds, 0); // 30 minutos = 1800 segundos
+        const remainingSeconds = Math.max(1800 - elapsedSeconds, 0); // 30 minutos = 1800 segundos
         setTimeLeft(remainingSeconds);
 
         if (!isActive || sessionEnding) return;

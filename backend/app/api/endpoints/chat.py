@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
@@ -86,13 +86,21 @@ async def send_message(
 
 @router.get("/history", dependencies=[Depends(security)])
 async def get_chat_history(
+    sort_order: str = Query("desc", regex="^(asc|desc)$"),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    sessions = db.query(ChatSession).filter(
+    query = db.query(ChatSession).filter(
         ChatSession.user_id == current_user.id
-    ).all()
+    )
     
+    if sort_order == "desc":
+        query = query.order_by(ChatSession.created_at.desc())
+    else:
+        query = query.order_by(ChatSession.created_at.asc())
+        
+    sessions = query.all()
+
     history = []
     for session in sessions:
         messages = db.query(ChatMessage).filter(
@@ -104,9 +112,9 @@ async def get_chat_history(
         ended_at = session.ended_at
         
         if started_at:
-            started_at = datetime.fromisoformat(started_at).replace(tzinfo=pytz.UTC).astimezone(tz).isoformat()
+            started_at = datetime.fromisoformat(started_at)
         if ended_at:
-            ended_at = datetime.fromisoformat(ended_at).replace(tzinfo=pytz.UTC).astimezone(tz).isoformat()
+            ended_at = datetime.fromisoformat(ended_at)
         
         history.append({
             "id": session.id,

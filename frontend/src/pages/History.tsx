@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 interface ChatSession {
   id: number;
@@ -28,8 +29,9 @@ const History: React.FC = () => {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await axios.get<{sessions: ChatSession[]}>('http://localhost:8000/api/chat/history');
+        const response = await axios.get<{sessions: ChatSession[]}>(API_ENDPOINTS.CHAT.HISTORY);
         setSessions(response.data.sessions);
+        console.log('Fetched sessions:', response.data.sessions);
       } catch (error) {
         console.error('Error fetching chat history:', error);
       } finally {
