@@ -15,3 +15,8 @@ export interface SessionSummary {
     message_count: number,
     duration_minutes: number
 }
+
+export interface AvailableSessions {
+    available_sessions: number;
+    used_sessions: number;
+}

@@ -13,4 +13,8 @@ export const API_ENDPOINTS = {
     MESSAGE: `${API_BASE_URL}/chat/message`,
     HISTORY: `${API_BASE_URL}/chat/history`,
   },
+  USER: {
+    SESSIONS: `${API_BASE_URL}/users/sessions`,
+    PROFILE: `${API_BASE_URL}/users/profile`,
+  }
 }; 

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
 import { useChatSession } from '../hooks/useChatSession';
-import { ActiveSession } from '../types/session';
+import { ActiveSession, AvailableSessions } from '../types/session';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -11,7 +11,11 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { startSession, endSession  } = useChatSession();
-  
+  const [userSessions, setUserSessions] = useState<{
+    available_sessions: number;
+    used_sessions: number;
+  } | null>(null); 
+
   const checkActiveSession = async () => {
     try {
       setLoading(true);
@@ -33,6 +37,35 @@ const Home: React.FC = () => {
     }
   };
 
+  const checkUserSessions = async () => {
+    try {
+      const response = await axios.get<AvailableSessions>(
+        API_ENDPOINTS.USER.SESSIONS,
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      setUserSessions(response.data);
+      if (response.data.available_sessions <= response.data.used_sessions) {
+        setError('Você atingiu o limite de sessões disponíveis. Entre em contato para mais informações.');
+      }
+    } catch (err) {
+      console.error('Error fetching user sessions:', err);
+    }
+  };
+
+  const handleStartSession = async () => {
+    if (!userSessions || userSessions.available_sessions <= userSessions.used_sessions) {
+      setError('Você atingiu o limite de sessões disponíveis. Entre em contato para mais informações.');
+      return;
+    }
+    
+    try {
+      await startSession();
+      await checkActiveSession();
+    } catch (err) {
+      console.error('Error starting session:', err);
+    }
+  };
+
   const handleEndSession = async (sessionId: number) => {
     try {
       await endSession(sessionId);
@@ -43,7 +76,7 @@ const Home: React.FC = () => {
   }
 
   useEffect(() => {
-    checkActiveSession();
+    Promise.all([checkActiveSession(), checkUserSessions()]);
   }, []);
 
   const formatDate = (dateString: string) => {
@@ -88,9 +121,14 @@ const Home: React.FC = () => {
             <p className="text-gray-600 mb-6">
               Comece uma nova conversa com o Lumen. Estamos aqui para te ouvir e ajudar.
             </p>
+            {userSessions && (
+            <p className="text-sm text-gray-500 mb-4">
+              Sessões disponíveis: {Math.max(0, userSessions.available_sessions - userSessions.used_sessions)}
+            </p>
+            )}
             <button
-              onClick={startSession}
-              disabled={loading || !!activeSession}
+              onClick={handleStartSession}
+              disabled={userSessions!.available_sessions <= userSessions!.used_sessions}
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
             >
               Iniciar Sessão

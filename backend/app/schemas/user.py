@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 from datetime import datetime
 from typing import Optional
 
@@ -12,8 +12,17 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int
     is_active: bool
-    created_at: str
-    last_login: Optional[str] = None
+    created_at: datetime
+    last_login: Optional[datetime] = None
 
-    class Config:
-        from_attributes = True 
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_encoders = {
+            datetime: lambda dt: dt.isoformat()
+        }
+    )
+
+class UserSessionsResponse(BaseModel):
+    available_sessions: int
+    used_sessions: int
+  

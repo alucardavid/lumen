@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserCreate, UserResponse, UserSessionsResponse
 from app.services.user_service import create_user, get_user_by_email
 
 router = APIRouter()
@@ -25,6 +25,17 @@ def get_users(
 ):
     users = db.query(User).all()
     return users
+
+@router.get("/sessions", response_model=UserSessionsResponse)
+def get_user_sessions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get available and used sessions for the current user"""
+    return {
+        "available_sessions": current_user.available_sessions,
+        "used_sessions": current_user.used_sessions
+    }
 
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
