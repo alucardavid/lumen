@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 interface User {
   id: number;
@@ -41,7 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUser = async () => {
     try {
-      const response = await axios.get<User>('http://localhost:8000/api/auth/me');
+      const response = await axios.get<User>(API_ENDPOINTS.AUTH.ME);
       setUser(response.data);
     } catch (error) {
       localStorage.removeItem('token');
@@ -56,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     formData.append('username', email);
     formData.append('password', password);
 
-    const response = await axios.post<TokenResponse>('http://localhost:8000/api/auth/token', formData, {
+    const response = await axios.post<TokenResponse>(API_ENDPOINTS.AUTH.TOKEN, formData, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       }
@@ -68,7 +69,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (name: string, email: string, password: string) => {
-    await axios.post<User>('http://localhost:8000/api/users/', {
+    await axios.post<User>(API_ENDPOINTS.USER.REGISTER, {
       name,
       email,
       password,

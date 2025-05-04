@@ -42,7 +42,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isAiThinking
   };
 
   const isGreetingMessage = (content: string) => {
-    return content.includes('Olá! Meu nome é Lumen');
+    return content.includes('Olá! Meu nome é Eudaimonia');
   };
 
   const formatMessageContent = (content: string) => {

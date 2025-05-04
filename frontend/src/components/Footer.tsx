@@ -32,7 +32,7 @@ const Footer: React.FC = () => {
               </li>
               <li>
                 <a
-                  href="https://www.cfp.org.br/"
+                  href="https://site.cfp.org.br/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-600 hover:text-blue-500"
@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
         </div>
         <div className="mt-8 border-t border-gray-200 pt-8">
           <p className="text-sm text-gray-400 text-center">
-            © {new Date().getFullYear()} Lumen. Todos os direitos reservados.
+            © {new Date().getFullYear()} Eudaimonia. Todos os direitos reservados.
           </p>
         </div>
       </div>
@@ -66,4 +66,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer; 
+export default Footer;

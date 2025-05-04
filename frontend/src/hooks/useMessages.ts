@@ -20,7 +20,7 @@ export const useMessages = (sessionId: number | null) => {
       setMessages(response.data);
       }
       else {
-        sendAiMessage(`👋 Olá! Meu nome é Lumen e estou aqui para te ajudar. Como você está se sentindo hoje? 
+        sendAiMessage(`👋 Olá! Meu nome é Eudaimonia e estou aqui para te ajudar. Como você está se sentindo hoje? 
 
                     💭 Posso te ajudar com:
                     • 🗣️ Conversar sobre seus sentimentos

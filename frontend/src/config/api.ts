@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+export const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 export const API_ENDPOINTS = {
   CHAT: {
@@ -16,5 +16,12 @@ export const API_ENDPOINTS = {
   USER: {
     SESSIONS: `${API_BASE_URL}/users/sessions`,
     PROFILE: `${API_BASE_URL}/users/profile`,
-  }
+    REGISTER: `${API_BASE_URL}/users/`,
+  },
+  AUTH: {
+    LOGIN: `${API_BASE_URL}/auth/login`,
+    LOGOUT: `${API_BASE_URL}/auth/logout`,
+    ME: `${API_BASE_URL}/auth/me`,
+    TOKEN: `${API_BASE_URL}/auth/token`,
+  },
 };

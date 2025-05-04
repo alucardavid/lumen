@@ -1,6 +1,6 @@
 {
-  "short_name": "Lumen",
-  "name": "Lumen - Apoio Psicológico",
+  "short_name": "Eudaimonia",
+  "name": "Eudaimonia - Apoio Psicológico",
   "icons": [
     {
       "src": "favicon.ico",
@@ -22,4 +22,4 @@
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
-} 
+}

@@ -102,7 +102,7 @@ const Home: React.FC = () => {
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            Bem-vindo ao Lumen
+            Bem-vindo ao Eudaimonia
           </h1>
           <p className="text-xl text-gray-600 mb-8">
             Seu assistente virtual para apoio emocional
@@ -119,7 +119,7 @@ const Home: React.FC = () => {
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Iniciar Nova Sessão</h2>
             <p className="text-gray-600 mb-6">
-              Comece uma nova conversa com o Lumen. Estamos aqui para te ouvir e ajudar.
+              Comece uma nova conversa com o Eudaimonia. Estamos aqui para te ouvir e ajudar.
             </p>
             {userSessions && (
             <p className="text-sm text-gray-500 mb-4">
@@ -179,4 +179,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home; 
+export default Home;

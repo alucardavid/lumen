@@ -18,7 +18,7 @@ const Navbar: React.FC = () => {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <Link to="/" className="text-xl font-bold text-blue-600">
-                Lumen
+                Eudaimonia
               </Link>
             </div>
             {user && (
@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
               </div>
             )}
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center">
+          <div className="flex items-center sm:ml-6">
             {user ? (
               <div className="ml-3 relative">
                 <div className="flex items-center space-x-4">
@@ -80,4 +80,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar; 
+export default Navbar;
