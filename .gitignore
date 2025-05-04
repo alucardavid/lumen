@@ -326,3 +326,4 @@ sketch
 
 .cursor
 # End of https://www.toptal.com/developers/gitignore/api/python,react,node
+.vercel

@@ -31,7 +31,6 @@ const History: React.FC = () => {
       try {
         const response = await axios.get<{sessions: ChatSession[]}>(API_ENDPOINTS.CHAT.HISTORY);
         setSessions(response.data.sessions);
-        console.log('Fetched sessions:', response.data.sessions);
       } catch (error) {
         console.error('Error fetching chat history:', error);
       } finally {
