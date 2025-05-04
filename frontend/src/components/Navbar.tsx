@@ -48,7 +48,7 @@ const Navbar: React.FC = () => {
             {user ? (
               <div className="ml-3 relative">
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">{user.name}</span>
+                  <span className="text-gray-700">{user.name.split(' ')[0]}</span>
                   <button
                     onClick={handleLogout}
                     className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"

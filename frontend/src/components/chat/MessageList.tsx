@@ -77,7 +77,7 @@ export const MessageList: React.FC<MessageListProps> = ({ messages, isAiThinking
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 mb-20" ref={messagesContainerRef}>
+    <div className="flex-1 overflow-y-auto p-4 pt-32 mb-20" ref={messagesContainerRef}>
       {messages.map((message) => (
         <div
           key={message.id}

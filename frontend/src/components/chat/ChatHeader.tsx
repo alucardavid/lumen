@@ -21,12 +21,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onTimeEnd
 }) => {
   return (
-    <>
+    <div className="fixed top-16 left-0 right-0 bg-white z-40">
       <div className="flex justify-between items-center p-4 border-b">
         <h1 className="text-2xl font-bold">Chat</h1>
         <div className="flex items-center gap-4">
           {error && (
-            <div className="text-sm text-red-600">
+            <div className="text-sm text-right text-red-600">
               {error}
             </div>
           )}
@@ -51,6 +51,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
