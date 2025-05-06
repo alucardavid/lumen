@@ -35,13 +35,15 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     fetchActiveSession();
+    window.scrollTo(0, 0);
   }, []); 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || !activeSession) return;
-    await sendMessage(input);
+    let message = input.trim();
     setInput('');
+    await sendMessage(message);
   };
 
   const handleEndSession = async () => {

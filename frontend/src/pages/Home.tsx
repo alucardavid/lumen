@@ -4,6 +4,7 @@ import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
 import { useChatSession } from '../hooks/useChatSession';
 import { ActiveSession, AvailableSessions } from '../types/session';
+import { useSummarys } from '../hooks/useSummarys';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Home: React.FC = () => {
     available_sessions: number;
     used_sessions: number;
   } | null>(null); 
+  const { createSessionSummary } = useSummarys(activeSession?.id || null);
 
   const checkActiveSession = async () => {
     try {
@@ -24,6 +26,7 @@ const Home: React.FC = () => {
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       setActiveSession(response.data);
+      handleSessionOver();
       setError(null);
     } catch (err) {
       const error = err as { response?: { status: number; data?: { detail: string } } };
@@ -75,8 +78,32 @@ const Home: React.FC = () => {
     }
   }
 
+  const handleSessionOver = async () => {
+    if (activeSession?.started_at) {
+      const sessionStartTime = new Date(activeSession.started_at);
+      const currentTime = new Date();
+      const sessionDuration = (currentTime.getTime() - sessionStartTime.getTime()) / (1000 * 60); // Duration in minutes
+
+      console.log('Session Duration:', sessionDuration, 'minutes');
+
+      if (sessionDuration >= 20) {
+        await handleEndSession(activeSession.id);
+        await createSessionSummary(); // Create summary after ending session
+        setActiveSession(null);
+        setError('Sua sessão foi encerrada após 30 minutos de inatividade.');
+      }
+    }
+  }
+
   useEffect(() => {
     Promise.all([checkActiveSession(), checkUserSessions()]);
+    window.scrollTo(0, 0);
+
+    const interval = setInterval(() => {
+      checkActiveSession();
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval); // Cleanup on component unmount
   }, []);
 
   const formatDate = (dateString: string) => {
