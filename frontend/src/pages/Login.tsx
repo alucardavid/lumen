@@ -8,16 +8,20 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
       await login(email, password);
       navigate('/');
     } catch (err) {
       setError('Email ou senha inválidos');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,9 +75,10 @@ const Login: React.FC = () => {
             <div>
               <button
                 type="submit"
+                disabled={loading}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Entrar
+                {loading ? 'Entrando...' : 'Entrar'} {/* Change button text while loading */}
               </button>
             </div>
 
