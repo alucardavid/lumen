@@ -22,11 +22,12 @@ const BuySessions: React.FC = () => {
             try {
                 const response = await axios.get<SessionsBundle[]>(
                     API_ENDPOINTS.SESSIONS.BUNDLES,
-                    { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+                    { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }}
                 );
                 setSessionBundles(response.data);
             } catch (error) {
                 console.error('Error fetching session prices:', error);
+                setError('Erro ao carregar os pacotes de sessões');
             }
         };
 

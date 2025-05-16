@@ -25,7 +25,7 @@ export const API_ENDPOINTS = {
     TOKEN: `${API_BASE_URL}/auth/token`,
   },
   SESSIONS:{
-    BUNDLES: `${API_BASE_URL}/session-bundles`,
+    BUNDLES: `${API_BASE_URL}/session-bundles/`,
   },
   PAYMENT: {
     CREATE: `${API_BASE_URL}/payment/create`,
