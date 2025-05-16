@@ -10,6 +10,7 @@ import History from './pages/History';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import BuySessions from './pages/BuySession';
 
 function App() {
   return (
@@ -53,6 +54,9 @@ function App() {
                   </PrivateRoute>
                 }
               />
+              <Route 
+                path="/buy-sessions" 
+                element={<BuySessions />} />
             </Routes>
           </main>
           <Footer />

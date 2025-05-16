@@ -24,4 +24,12 @@ export const API_ENDPOINTS = {
     ME: `${API_BASE_URL}/auth/me`,
     TOKEN: `${API_BASE_URL}/auth/token`,
   },
+  SESSIONS:{
+    BUNDLES: `${API_BASE_URL}/session-bundles`,
+  },
+  PAYMENT: {
+    CREATE: `${API_BASE_URL}/payment/create`,
+    WEBHOOK: `${API_BASE_URL}/payment/webhook`,
+    STATUS: `${API_BASE_URL}/payment/status`,
+  }
 };

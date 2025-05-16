@@ -10,7 +10,7 @@ const Home: React.FC = () => {
   const navigate = useNavigate();
   const [activeSession, setActiveSession] = useState<ActiveSession | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | JSX.Element | null>(null);
   const { startSession, endSession  } = useChatSession();
   const [userSessions, setUserSessions] = useState<{
     available_sessions: number;
@@ -48,7 +48,12 @@ const Home: React.FC = () => {
       );
       setUserSessions(response.data);
       if (response.data.available_sessions <= response.data.used_sessions) {
-        setError('Você atingiu o limite de sessões disponíveis. Entre em contato para mais informações.');
+        setError(<span>
+                Você atingiu o limite de sessões disponíveis.{' '}
+                <a href="/buy-sessions" className="text-blue-600 hover:text-blue-800 underline">
+                  Clique aqui para adquirir mais sessões
+                </a>
+              </span>);
       }
     } catch (err) {
       console.error('Error fetching user sessions:', err);
@@ -57,7 +62,12 @@ const Home: React.FC = () => {
 
   const handleStartSession = async () => {
     if (!userSessions || userSessions.available_sessions <= userSessions.used_sessions) {
-      setError('Você atingiu o limite de sessões disponíveis. Entre em contato para mais informações.');
+      setError(<span>
+                Você atingiu o limite de sessões disponíveis.{' '}
+                <a href="/buy-sessions" className="text-blue-600 hover:text-blue-800 underline">
+                  Clique aqui para adquirir mais sessões
+                </a>
+              </span>);
       return;
     }
     
@@ -125,7 +135,7 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="h-full bg-gray-100 pt-16">
+    <div className="h-full bg-gray-100 pt-5">
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">

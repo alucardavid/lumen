@@ -20,3 +20,16 @@ export interface AvailableSessions {
     available_sessions: number;
     used_sessions: number;
 }
+
+export interface SessionPrice {
+    id: number;
+    quantity: number;
+    price_per_unit: number;
+    total_price: number;
+    description: string;
+}
+
+export interface UserSessions {
+    available_sessions: number;
+    used_sessions: number;
+}

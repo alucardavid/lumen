@@ -73,12 +73,9 @@ def calculate_session_metrics(db: Session, session_id: int) -> dict:
         else:
             end_time = end_time.astimezone(utc_minus_3)
         
-        print("start_time", start_time.tzinfo)
-        print("end_time", end_time.tzinfo)
-
         # Calculate duration in minutes
         duration_minutes = (end_time - start_time).total_seconds() / 60
-        print("duration_minutes", duration_minutes)
+        
     except Exception as e:
         print(f"Error calculating duration: {str(e)}")
         raise

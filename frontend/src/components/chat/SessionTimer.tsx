@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface SessionTimerProps {
   startTime: string | undefined;
@@ -25,7 +25,7 @@ export const SessionTimer: React.FC<SessionTimerProps> = ({
     setTimeEndCalled(false);
   }, [startTime, isActive]);
 
-  useEffect(() => {
+  const updateTimer = useCallback(() => {
     if (!startTime || !isActive || sessionEnding) {
       console.log('No start time available or session is not active or is ending');
       return;
@@ -58,6 +58,35 @@ export const SessionTimer: React.FC<SessionTimerProps> = ({
     }
   }, [startTime, isActive, sessionEnding, timeEndCalled, onTimeWarning, onTimeEnd]);
 
+  useEffect(() => {
+    if (!startTime || !isActive || sessionEnding) {
+      return;
+    }
+
+    // Initial update
+    updateTimer();
+
+    // Use requestAnimationFrame for smoother updates
+    let frameId: number;
+    let lastUpdate = performance.now();
+    
+    const animate = (timestamp: number) => {
+      if (timestamp - lastUpdate >= 1000) { // Update every second
+        updateTimer();
+        lastUpdate = timestamp;
+      }
+      frameId = requestAnimationFrame(animate);
+    };
+
+    frameId = requestAnimationFrame(animate);
+
+    return () => {
+      if (frameId) {
+        cancelAnimationFrame(frameId);
+      }
+    };
+  }, [startTime, isActive, sessionEnding, updateTimer]);
+  
   if (!startTime || timeLeft <= 0 || !isActive) return null;
 
   const minutes = Math.floor(timeLeft / 60);

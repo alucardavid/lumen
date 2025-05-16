@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.chat import ChatSession, ChatMessage
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 def calculate_session_metrics(db: Session, session_id: int) -> dict:
     session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
@@ -9,9 +9,23 @@ def calculate_session_metrics(db: Session, session_id: int) -> dict:
     
     messages = db.query(ChatMessage).filter(ChatMessage.session_id == session_id).all()
     
-    # Calculate duration
+    # Create UTC-3 timezone
+    utc_minus_3 = timezone(timedelta(hours=-3))
+    
+    # Parse start_time and ensure it's in UTC-3
     start_time = datetime.fromisoformat(session.started_at)
-    end_time = datetime.fromisoformat(session.ended_at) if session.ended_at else datetime.utcnow()
+    if start_time.tzinfo is None:
+        start_time = start_time.replace(tzinfo=utc_minus_3)
+    else:
+        start_time = start_time.astimezone(utc_minus_3)
+    
+    # Parse end_time and ensure it's in UTC-3
+    end_time = datetime.fromisoformat(session.ended_at) if session.ended_at else datetime.now()
+    if end_time.tzinfo is None:
+        end_time = end_time.replace(tzinfo=utc_minus_3)
+    else:
+        end_time = end_time.astimezone(utc_minus_3)
+        
     duration_minutes = (end_time - start_time).total_seconds() / 60
     
     # Count messages
