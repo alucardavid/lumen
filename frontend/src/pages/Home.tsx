@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 import { useChatSession } from '../hooks/useChatSession';
 import { ActiveSession, AvailableSessions } from '../types/session';
 import { useSummarys } from '../hooks/useSummarys';
+import { useAuthVerification } from '../hooks/useAuthVerification';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Home: React.FC = () => {
     used_sessions: number;
   } | null>(null); 
   const { createSessionSummary } = useSummarys(activeSession?.id || null);
+  const user = useAuthVerification();
 
   const checkActiveSession = async () => {
     try {
@@ -111,7 +113,7 @@ const Home: React.FC = () => {
 
     const interval = setInterval(() => {
       checkActiveSession();
-    }, 30000); // 30 seconds
+    }, 60000); // 30 seconds
 
     return () => clearInterval(interval); // Cleanup on component unmount
   }, []);

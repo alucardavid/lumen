@@ -83,6 +83,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  useEffect(() => {
+  const interceptor = axios.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        logout();
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  return () => {
+    axios.interceptors.response.eject(interceptor);
+  };
+}, []);
+
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
