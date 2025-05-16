@@ -14,7 +14,7 @@ async def list_bundles(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    bundles = db.query(SessionBundle).filter(SessionBundle.is_active == True).all()
+    bundles = db.query(SessionBundle).filter(SessionBundle.is_active == True).order_by(SessionBundle.quantity).all()
     return bundles
 
 @router.post("/", response_model=SessionBundleSchema)
